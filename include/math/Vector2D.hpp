@@ -2,6 +2,7 @@
 #define VECTOR2D_HPP
 
 #include <cmath>
+#include <iostream>
 
 class Vector2D {
 private:
@@ -15,7 +16,28 @@ public:
 	double getX() const noexcept;
 	double getY() const noexcept;
 
-	/* Vector Operators */
+	/* --- Vector Operators --- */
+
+	/* Arithmetic Operators */
+	Vector2D operator+(Vector2D const& v) const;
+	Vector2D operator-(Vector2D const& v) const;
+	Vector2D operator*(double a) const;
+	Vector2D operator/(double a) const;
+
+	/* Compound Assignment Operators */
+	Vector2D operator+=(Vector2D const& v) const;
+	Vector2D operator+=(double a) const;
+	Vector2D operator-=(Vector2D const& v) const;
+	Vector2D operator-=(double a) const;
+	Vector2D operator*=(double a) const;
+	Vector2D operator/=(double a) const;
+
+	/* Comparison Operators */
+	bool operator==(const Vector2D& v) const;
+	bool operator!=(const Vector2D& v) const;
+
+	/* Stream Operator */
+	friend std::ostream& operator<<(std::ostream& os, const Vector2D&v);
 };
 
 #endif // VECTOR2D_HPP
