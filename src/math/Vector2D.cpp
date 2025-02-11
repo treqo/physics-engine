@@ -24,9 +24,54 @@ Vector2D Vector2D::operator/(double a) const {
 	return Vector2D(this->x / a, this->y / a);
 }
 
-Vector2D& Vector2D::operator+=(Vector2D const& v) const {
+Vector2D& Vector2D::operator+=(Vector2D const& v) {
 	this->x += v.x;
 	this->y += v.y;
 	return *this;
 }
+
+Vector2D& Vector2D::operator+=(double a) {
+	this->x += a;
+	this->y += a;
+	return *this;
+}
+
+Vector2D& Vector2D::operator-=(Vector2D const& v) {
+	this->x -= v.x;
+	this->y -= v.y;
+	return *this;
+}
+
+
+Vector2D& Vector2D::operator-=(double a) {
+	this->x -= a;
+	this->y -= a;
+	return *this;
+}
+
+Vector2D& Vector2D::operator*=(double a) {
+	this->x *= a;
+	this->y *= a;
+	return *this;
+}
+
+Vector2D& Vector2D::operator/=(double a) {
+	this->x /= a;
+	this->y /= a;
+	return *this;
+}
+
+bool Vector2D::operator==(const Vector2D& v) const {
+	return (this->x == v.x) && (this->y == v.y);
+}
+
+bool Vector2D::operator!=(const Vector2D& v) const {
+	return (this->x != v.x) || (this->y != v.y);
+}
+
+std::ostream& operator<<(std::ostream& os, const Vector2D& v) {
+	os << "(" << v.x << "," << v.y << ")";
+	return os;
+}
+
 
