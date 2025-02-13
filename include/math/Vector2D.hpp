@@ -38,6 +38,14 @@ public:
 
 	/* Stream Operator */
 	friend std::ostream& operator<<(std::ostream& os, const Vector2D&v);
+
+	/* Vector Operations */
+	double magnitude() const noexcept;
+
+	Vector2D unit(Vector2D& v) const;
+
+	double dot(Vector2D& v) const;
+	friend double dot(const Vector2D& v1, const Vector2D& v2);
 };
 
 #endif // VECTOR2D_HPP

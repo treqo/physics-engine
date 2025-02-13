@@ -74,4 +74,23 @@ std::ostream& operator<<(std::ostream& os, const Vector2D& v) {
 	return os;
 }
 
+double Vector2D::magnitude() const noexcept {
+	return sqrt(pow(this->x, 2) + pow(this->y, 2));
+}
+
+Vector2D Vector2D::unit(Vector2D& v) const {
+	return v / v.magnitude();
+}
+
+double Vector2D::dot(Vector2D& v) const {
+	return v.x * this->x + v.y * this->y;
+}
+
+
+double dot(const Vector2D& v1, const Vector2D& v2) {
+	return v1.x * v2.x + v1.y * v2.y;
+}
+
+
+
 
