@@ -11,6 +11,7 @@ public:
 	/* Constructors */
 	Vector2D();
 	Vector2D(double x_, double y_);
+	Vector2D(const Vector2D& v);
 
 	/* Getters */
 	double getX() const noexcept;
@@ -42,10 +43,21 @@ public:
 	/* Vector Operations */
 	double magnitude() const noexcept;
 
-	Vector2D unit(Vector2D& v) const;
+	void normalize();
 
-	double dot(Vector2D& v) const;
+	Vector2D unit() const;
+	friend Vector2D unit(const Vector2D& v);
+
+	double dot(const Vector2D& v) const;
 	friend double dot(const Vector2D& v1, const Vector2D& v2);
+	
+	double angle(const Vector2D &v) const;
+
+	double distanceTo(const Vector2D& v) const;
+	friend double distanceBetween(const Vector2D& v1, const Vector2D& v2);
+
+	Vector2D projectionOnto(const Vector2D& v) const;
+
 };
 
 #endif // VECTOR2D_HPP

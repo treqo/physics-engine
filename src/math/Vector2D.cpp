@@ -5,6 +5,8 @@ Vector2D::Vector2D() : x(0.0), y(0.0) {}
 
 Vector2D::Vector2D(double x_, double y_) : x(x_), y(y_) {}
 
+Vector2D::Vector2D(const Vector2D& v) : x(v.x), y(v.y) {}
+
 double Vector2D::getX() const noexcept { return x; }
 double Vector2D::getY() const noexcept { return y; }
 
@@ -78,11 +80,19 @@ double Vector2D::magnitude() const noexcept {
 	return sqrt(pow(this->x, 2) + pow(this->y, 2));
 }
 
-Vector2D Vector2D::unit(Vector2D& v) const {
-	return v / v.magnitude();
+void Vector2D::normalize() {
+	*this / this->magnitude();
 }
 
-double Vector2D::dot(Vector2D& v) const {
+Vector2D Vector2D::unit() const {
+	return Vector2D(this->x, this->y) / this->magnitude();
+}
+
+Vector2D unit(const Vector2D& v) {
+	return Vector2D(v.x, v.y) / v.magnitude();
+}
+
+double Vector2D::dot(const Vector2D& v) const {
 	return v.x * this->x + v.y * this->y;
 }
 
@@ -91,6 +101,19 @@ double dot(const Vector2D& v1, const Vector2D& v2) {
 	return v1.x * v2.x + v1.y * v2.y;
 }
 
+double Vector2D::angle(const Vector2D& v) const {
+	return acos(this->dot(v) / (this->magnitude() * v.magnitude()));
+}
 
+double Vector2D::distanceTo(const Vector2D& v) const {
+	return sqrt(pow(this->x - v.x, 2) + pow(this->y - v.y, 2));
+}
 
+double distanceBetween(const Vector2D& v1, const Vector2D& v2) {
+	return sqrt(pow(v1.x - v2.x, 2) + pow(v1.y - v2.y, 2));
+}
+
+Vector2D Vector2D::projectionOnto(const Vector2D& v) const {
+	return Vector2D(v) * (this->dot(v) / pow(v.magnitude(), 2));
+}
 
