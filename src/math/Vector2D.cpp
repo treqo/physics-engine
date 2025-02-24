@@ -117,3 +117,43 @@ Vector2D Vector2D::projectionOnto(const Vector2D& v) const {
 	return Vector2D(v) * (this->dot(v) / pow(v.magnitude(), 2));
 }
 
+// Vector2D perpendicular(const Vector2D& v) {
+// 	return Vector2D(-v.y, v.x);
+// }
+
+double Vector2D::cross(const Vector2D& v) const {
+	return this->x * v.y - this->y * v.x;
+}
+
+double cross(const Vector2D& v1, const Vector2D& v2) {
+	return v1.x * v2.y - v1.y * v2.x;
+}
+
+Vector2D Vector2D::reflect(const Vector2D& normal) const {
+	// Assumes normal is normalized
+	double dotProduct = this->dot(normal);
+	return *this - normal * (2.0 * dotProduct);
+}
+
+Vector2D Vector2D::rotate(double angle) const {
+	double cosA = cos(angle);
+	double sinA = sin(angle);
+	return Vector2D(
+		x * cosA - y * sinA,
+		x * sinA + y * cosA
+	);
+}
+
+Vector2D Vector2D::lerp(const Vector2D& start, const Vector2D& end, double t) {
+	// Clamp t between 0 and 1
+	t = std::max(0.0, std::min(1.0, t));
+	return start * (1.0 - t) + end * t;
+}
+
+bool Vector2D::isZero(double epsilon) const noexcept {
+	return std::abs(x) < epsilon && std::abs(y) < epsilon;
+}
+
+double Vector2D::squaredMagnitude() const noexcept {
+	return x * x + y * y;
+}

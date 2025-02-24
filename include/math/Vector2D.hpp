@@ -58,6 +58,21 @@ public:
 
 	Vector2D projectionOnto(const Vector2D& v) const;
 
+	// Vector2D perpendicular() const;
+
+	/* Additional Vector Operations */
+	double cross(const Vector2D& v) const;
+	friend double cross(const Vector2D& v1, const Vector2D& v2);
+
+	Vector2D reflect(const Vector2D& normal) const;
+	
+	Vector2D rotate(double angle) const;
+	
+	static Vector2D lerp(const Vector2D& start, const Vector2D& end, double t);
+	
+	bool isZero(double epsilon = 1e-10) const noexcept;
+	
+	double squaredMagnitude() const noexcept;
 };
 
 #endif // VECTOR2D_HPP
