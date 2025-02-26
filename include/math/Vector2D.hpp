@@ -16,6 +16,8 @@ public:
 	/* Getters */
 	double getX() const noexcept;
 	double getY() const noexcept;
+	void setX(double x_);
+	void setY(double y_);
 
 	/* --- Vector Operators --- */
 

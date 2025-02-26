@@ -9,6 +9,8 @@ Vector2D::Vector2D(const Vector2D& v) : x(v.x), y(v.y) {}
 
 double Vector2D::getX() const noexcept { return x; }
 double Vector2D::getY() const noexcept { return y; }
+void Vector2D::setX(double x_) { this->x = x_; }
+void Vector2D::setY(double y_) { this->y = y_; }
 
 Vector2D Vector2D::operator+(Vector2D const& v) const {
 	return Vector2D(this->x + v.x, this->y + v.y);
