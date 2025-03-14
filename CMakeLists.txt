@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 project(PhysicsEngine)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set SFML_DIR before calling find_package
 set(SFML_DIR "/opt/homebrew/lib/cmake/SFML")

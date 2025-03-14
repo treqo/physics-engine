@@ -13,7 +13,7 @@ public:
 	Vector2D(double x_, double y_);
 	Vector2D(const Vector2D& v);
 
-	/* Getters */
+	/* Getters & Setters */
 	double getX() const noexcept;
 	double getY() const noexcept;
 	void setX(double x_);

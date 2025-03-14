@@ -1,16 +1,22 @@
 #include "math/Vector2D.hpp"
 #include <stdexcept>
 
+/* Constructors */
+
 Vector2D::Vector2D() : x(0.0), y(0.0) {}
 
 Vector2D::Vector2D(double x_, double y_) : x(x_), y(y_) {}
 
 Vector2D::Vector2D(const Vector2D& v) : x(v.x), y(v.y) {}
 
+/* Getters & Setters */
+
 double Vector2D::getX() const noexcept { return x; }
 double Vector2D::getY() const noexcept { return y; }
 void Vector2D::setX(double x_) { this->x = x_; }
 void Vector2D::setY(double y_) { this->y = y_; }
+
+/* Arithmetic Operators */ 
 
 Vector2D Vector2D::operator+(Vector2D const& v) const {
 	return Vector2D(this->x + v.x, this->y + v.y);
@@ -27,6 +33,8 @@ Vector2D Vector2D::operator*(double a) const {
 Vector2D Vector2D::operator/(double a) const {
 	return Vector2D(this->x / a, this->y / a);
 }
+
+/* Compound Assignment Operators */
 
 Vector2D& Vector2D::operator+=(Vector2D const& v) {
 	this->x += v.x;
@@ -65,6 +73,8 @@ Vector2D& Vector2D::operator/=(double a) {
 	return *this;
 }
 
+/* Comparison Operators */
+
 bool Vector2D::operator==(const Vector2D& v) const {
 	return (this->x == v.x) && (this->y == v.y);
 }
@@ -73,17 +83,21 @@ bool Vector2D::operator!=(const Vector2D& v) const {
 	return (this->x != v.x) || (this->y != v.y);
 }
 
+/* Stream Operator */
+
 std::ostream& operator<<(std::ostream& os, const Vector2D& v) {
 	os << "(" << v.x << "," << v.y << ")";
 	return os;
 }
+
+/* Vector Operations */
 
 double Vector2D::magnitude() const noexcept {
 	return sqrt(pow(this->x, 2) + pow(this->y, 2));
 }
 
 void Vector2D::normalize() {
-	*this / this->magnitude();
+	*this /= this->magnitude();
 }
 
 Vector2D Vector2D::unit() const {
