@@ -168,7 +168,8 @@ Matrix Matrix::operator*(double scalar) const
 Matrix Matrix::operator*(const Matrix& other) const
 {
     if (cols != other.rows) {
-        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
+        throw std::invalid_argument("Matrix dimensions incompatible for multiplication: " 
+            + std::to_string(cols) + " columns != " + std::to_string(other.rows) + " rows");
     }
     
     Matrix result(rows, other.cols, 0.0);
@@ -247,8 +248,10 @@ Matrix& Matrix::operator*=(double scalar)
 // Compound matrix multiplication
 Matrix& Matrix::operator*=(const Matrix& other) {
     if (cols != other.rows) {
-        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
+        throw std::invalid_argument("Matrix dimensions incompatible for multiplication: " 
+            + std::to_string(cols) + " columns != " + std::to_string(other.rows) + " rows");
     }
+    
     *this = std::move(*this * other);
     return *this;
 }
@@ -287,12 +290,43 @@ double Matrix::determinant() const {
     if (!isSquare()) {
         throw std::invalid_argument("Determinant is defined only for square matrices");
     }
-
-    auto [L, U] = this->luDecomposition();
     
-    double det = 1.0;
-    for (size_t i = 0; i < rows; ++i) {
-        det *= U(i, i);  // Determinant is product of diagonal elements of U
+    // For small matrices, use direct formulas for better numerical stability
+    // 1x1 matrix
+    if (rows == 1) {
+        return data[0][0];
+    }
+    
+    // 2x2 matrix
+    if (rows == 2) {
+        return data[0][0] * data[1][1] - data[0][1] * data[1][0];
+    }
+    
+    // 3x3 matrix using Sarrus' rule
+    if (rows == 3) {
+        return data[0][0] * (data[1][1] * data[2][2] - data[1][2] * data[2][1])
+             - data[0][1] * (data[1][0] * data[2][2] - data[1][2] * data[2][0])
+             + data[0][2] * (data[1][0] * data[2][1] - data[1][1] * data[2][0]);
+    }
+    
+    // For larger matrices, use cofactor expansion along the first row
+    double det = 0.0;
+    for (size_t j = 0; j < cols; ++j) {
+        // Create submatrix by removing first row and column j
+        std::vector<std::vector<double>> submatrix_data(rows - 1, std::vector<double>(cols - 1));
+        for (size_t r = 1; r < rows; ++r) {
+            size_t col_idx = 0;
+            for (size_t c = 0; c < cols; ++c) {
+                if (c != j) {
+                    submatrix_data[r-1][col_idx] = data[r][c];
+                    ++col_idx;
+                }
+            }
+        }
+        
+        Matrix submatrix(submatrix_data);
+        double cofactor = data[0][j] * std::pow(-1.0, j);
+        det += cofactor * submatrix.determinant();
     }
     
     return det;
@@ -499,7 +533,16 @@ std::pair<Matrix, Matrix> Matrix::luDecomposition() const
 
 // Check if matrix is singular
 bool Matrix::isSingular(double tolerance) const {
-    return std::abs(this->determinant()) < tolerance;
+    if (!isSquare()) {
+        return false; // Non-square matrices are considered non-singular
+    }
+    
+    try {
+        double det = determinant();
+        return std::abs(det) < tolerance;
+    } catch (const std::exception&) {
+        return true; // If determinant calculation fails, consider it singular
+    }
 }
 
 // Equality comparison
