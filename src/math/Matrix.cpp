@@ -1,4 +1,4 @@
-#include "Matrix.hpp"
+#include "math/Matrix.hpp"
 #include <algorithm>
 #include <numeric>
 #include <cmath>
@@ -86,15 +86,16 @@ Matrix& Matrix::operator=(const Matrix& other)
 }
 
 // Move assignment
-Matrix& Matrix::operator=(Matrix&& other) noexcept
-{
+Matrix& Matrix::operator=(Matrix&& other) noexcept {
     if (this != &other) {
+        data = std::move(other.data);
         rows = other.rows;
         cols = other.cols;
-        data = std::move(other.data);
-        
+
+        // Reset other to a valid empty state
         other.rows = 0;
         other.cols = 0;
+        other.data.clear();
     }
     return *this;
 }
@@ -244,9 +245,11 @@ Matrix& Matrix::operator*=(double scalar)
 }
 
 // Compound matrix multiplication
-Matrix& Matrix::operator*=(const Matrix& other)
-{
-    *this = (*this) * other;
+Matrix& Matrix::operator*=(const Matrix& other) {
+    if (cols != other.rows) {
+        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
+    }
+    *this = std::move(*this * other);
     return *this;
 }
 
@@ -280,44 +283,16 @@ Matrix Matrix::transpose() const
 }
 
 // Matrix determinant (only for square matrices)
-double Matrix::determinant() const
-{
-    if (rows != cols) {
+double Matrix::determinant() const {
+    if (!isSquare()) {
         throw std::invalid_argument("Determinant is defined only for square matrices");
     }
+
+    auto [L, U] = this->luDecomposition();
     
-    // Base cases
-    if (rows == 1) {
-        return data[0][0];
-    }
-    if (rows == 2) {
-        return data[0][0] * data[1][1] - data[0][1] * data[1][0];
-    }
-    if (rows == 3) {
-        // For 3x3 matrices, use the rule of Sarrus for better performance
-        return data[0][0] * (data[1][1] * data[2][2] - data[1][2] * data[2][1]) -
-               data[0][1] * (data[1][0] * data[2][2] - data[1][2] * data[2][0]) +
-               data[0][2] * (data[1][0] * data[2][1] - data[1][1] * data[2][0]);
-    }
-    
-    // For 4x4 and larger matrices, use cofactor expansion
-    double det = 0.0;
-    for (size_t j = 0; j < cols; ++j) {
-        // Create submatrix
-        std::vector<std::vector<double>> submatrix_data(rows - 1, std::vector<double>(cols - 1));
-        for (size_t i = 1; i < rows; ++i) {
-            size_t col_idx = 0;
-            for (size_t k = 0; k < cols; ++k) {
-                if (k != j) {
-                    submatrix_data[i - 1][col_idx] = data[i][k];
-                    ++col_idx;
-                }
-            }
-        }
-        
-        Matrix submatrix(submatrix_data);
-        double cofactor = data[0][j] * ((j % 2 == 0) ? 1 : -1);
-        det += cofactor * submatrix.determinant();
+    double det = 1.0;
+    for (size_t i = 0; i < rows; ++i) {
+        det *= U(i, i);  // Determinant is product of diagonal elements of U
     }
     
     return det;
@@ -385,8 +360,7 @@ Matrix Matrix::inverse() const
 }
 
 // Matrix power (only for square matrices)
-Matrix Matrix::power(int exponent) const
-{
+Matrix Matrix::power(int exponent) const {
     if (!isSquare()) {
         throw std::invalid_argument("Matrix power is defined only for square matrices");
     }
@@ -395,22 +369,18 @@ Matrix Matrix::power(int exponent) const
         return this->inverse().power(-exponent);
     }
     
-    if (exponent == 0) {
-        return Matrix::identity(rows);
+    Matrix result = Matrix::identity(rows);
+    Matrix base = *this;
+    
+    while (exponent > 0) {
+        if (exponent % 2 == 1) {
+            result *= base;
+        }
+        base *= base;
+        exponent /= 2;
     }
     
-    if (exponent == 1) {
-        return *this;
-    }
-    
-    // Use binary exponentiation for efficiency
-    if (exponent % 2 == 0) {
-        Matrix half_power = this->power(exponent / 2);
-        return half_power * half_power;
-    } else {
-        Matrix half_power = this->power((exponent - 1) / 2);
-        return half_power * half_power * (*this);
-    }
+    return result;
 }
 
 // Matrix trace (sum of diagonal elements)
@@ -528,13 +498,8 @@ std::pair<Matrix, Matrix> Matrix::luDecomposition() const
 }
 
 // Check if matrix is singular
-bool Matrix::isSingular(double tolerance) const
-{
-    if (!isSquare()) {
-        return false; // Non-square matrices are not singular in the typical sense
-    }
-    
-    return std::abs(determinant()) < tolerance;
+bool Matrix::isSingular(double tolerance) const {
+    return std::abs(this->determinant()) < tolerance;
 }
 
 // Equality comparison
@@ -562,13 +527,13 @@ bool Matrix::operator!=(const Matrix& other) const
 }
 
 // Print matrix
-void Matrix::print() const
-{
-    for (size_t i = 0; i < rows; ++i) {
-        for (size_t j = 0; j < cols; ++j) {
-            std::cout << std::setw(10) << std::setprecision(4) << data[i][j] << " ";
+void Matrix::print() const {
+    for (const auto& row : data) {
+        std::cout << "| ";
+        for (double val : row) {
+            std::cout << std::setw(8) << std::setprecision(4) << val << " ";
         }
-        std::cout << std::endl;
+        std::cout << "|\n";
     }
 }
 
@@ -598,11 +563,8 @@ std::string Matrix::toString() const
 }
 
 // Check if matrix is symmetric
-bool Matrix::isSymmetric() const
-{
-    if (!isSquare()) {
-        return false;
-    }
+bool Matrix::isSymmetric() const {
+    if (!isSquare()) return false;
     
     for (size_t i = 0; i < rows; ++i) {
         for (size_t j = i + 1; j < cols; ++j) {
